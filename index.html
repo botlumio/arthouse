@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arthouse — pixels. patterns. paradoxes.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0a0a08;
+      --canvas: #f5f0e8;
+      --cream: #ede7d5;
+      --gold: #c9a84c;
+      --rust: #b84a2e;
+      --sage: #6b7c5e;
+      --off-white: #faf7f2;
+      --dark-ink: #111109;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--ink);
+      color: var(--canvas);
+      font-family: 'Cormorant Garamond', serif;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* ── GRAIN OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.4;
+    }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding: 40px 24px;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 80%, rgba(201,168,76,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 80% 20%, rgba(184,74,46,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 100% 100% at 50% 50%, rgba(107,124,94,0.05) 0%, transparent 70%),
+        var(--ink);
+    }
+
+    /* Decorative lines */
+    .hero-bg::before {
+      content: '';
+      position: absolute;
+      top: 15%;
+      left: -5%;
+      width: 110%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), rgba(201,168,76,0.6), rgba(201,168,76,0.3), transparent);
+      transform: rotate(-1.5deg);
+    }
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      bottom: 22%;
+      left: -5%;
+      width: 110%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(184,74,46,0.2), rgba(184,74,46,0.5), rgba(184,74,46,0.2), transparent);
+      transform: rotate(0.8deg);
+    }
+
+    /* Corner brackets */
+    .corner {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      opacity: 0.4;
+    }
+    .corner-tl { top: 32px; left: 32px; border-top: 1px solid var(--gold); border-left: 1px solid var(--gold); }
+    .corner-tr { top: 32px; right: 32px; border-top: 1px solid var(--gold); border-right: 1px solid var(--gold); }
+    .corner-bl { bottom: 32px; left: 32px; border-bottom: 1px solid var(--gold); border-left: 1px solid var(--gold); }
+    .corner-br { bottom: 32px; right: 32px; border-bottom: 1px solid var(--gold); border-right: 1px solid var(--gold); }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      animation: fadeUp 1.2s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .label-top {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.8;
+      margin-bottom: 28px;
+      animation: fadeUp 1s 0.2s both;
+    }
+
+    h1.wordmark {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: clamp(72px, 18vw, 200px);
+      line-height: 0.88;
+      letter-spacing: -0.03em;
+      color: var(--canvas);
+      text-transform: lowercase;
+      animation: fadeUp 1s 0.3s both;
+      position: relative;
+    }
+
+    h1.wordmark em {
+      font-style: italic;
+      color: var(--gold);
+      display: block;
+    }
+
+    .tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(16px, 2.5vw, 22px);
+      color: rgba(245,240,232,0.5);
+      margin-top: 20px;
+      letter-spacing: 0.08em;
+      animation: fadeUp 1s 0.5s both;
+    }
+
+    .tagline span { color: var(--rust); font-style: normal; }
+
+    .cta-group {
+      margin-top: 52px;
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 1s 0.7s both;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--gold);
+      color: var(--ink);
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 16px 32px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--rust);
+      transform: translateX(-101%);
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .btn-primary:hover::before { transform: translateX(0); }
+    .btn-primary span { position: relative; z-index: 1; }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(245,240,232,0.25);
+      color: rgba(245,240,232,0.7);
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 16px 32px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.4;
+      animation: fadeUp 1s 1.2s both;
+    }
+    .scroll-hint span {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%,100% { transform: scaleY(1); opacity: 0.4; }
+      50% { transform: scaleY(1.3); opacity: 0.8; }
+    }
+
+    /* ── MARQUEE ── */
+    .marquee-band {
+      background: var(--gold);
+      padding: 12px 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .marquee-track {
+      display: inline-flex;
+      animation: marquee 18s linear infinite;
+    }
+    .marquee-item {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--ink);
+      padding: 0 32px;
+    }
+    .marquee-dot { opacity: 0.4; }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ── HOW IT WORKS ── */
+    #how {
+      padding: 120px 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+      margin-bottom: 72px;
+    }
+    .section-number {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--rust);
+      text-transform: uppercase;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--canvas);
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 32px;
+      padding: 40px 0;
+      border-bottom: 1px solid rgba(245,240,232,0.08);
+      align-items: start;
+      transition: background 0.3s;
+      cursor: default;
+    }
+    .step:first-child { border-top: 1px solid rgba(245,240,232,0.08); }
+    .step:hover { background: rgba(201,168,76,0.03); }
+
+    .step-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 56px;
+      font-weight: 900;
+      color: rgba(201,168,76,0.15);
+      line-height: 1;
+      text-align: right;
+      transition: color 0.3s;
+    }
+    .step:hover .step-num { color: rgba(201,168,76,0.35); }
+
+    .step-body { padding-top: 8px; }
+    .step-body h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--canvas);
+      margin-bottom: 10px;
+      letter-spacing: 0.02em;
+    }
+    .step-body p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: rgba(245,240,232,0.5);
+      font-weight: 300;
+    }
+    .step-body a { color: var(--gold); text-decoration: none; }
+    .step-body a:hover { text-decoration: underline; }
+
+    /* ── CHAT DEMO ── */
+    #demo {
+      padding: 80px 24px 120px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .chat-frame {
+      background: #111109;
+      border: 1px solid rgba(245,240,232,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .chat-header {
+      background: rgba(245,240,232,0.04);
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(245,240,232,0.08);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .chat-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      color: var(--ink);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+    .chat-name {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--canvas);
+      letter-spacing: 0.05em;
+    }
+    .chat-status {
+      font-size: 10px;
+      color: var(--sage);
+      font-family: 'Space Mono', monospace;
+    }
+    .online-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--sage);
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .chat-body {
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .msg {
+      max-width: 80%;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      animation: msgIn 0.4s ease both;
+    }
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .msg.bot { align-self: flex-start; }
+    .msg.user { align-self: flex-end; }
+
+    .bubble {
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.6;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+    }
+    .msg.bot .bubble {
+      background: rgba(245,240,232,0.06);
+      border: 1px solid rgba(245,240,232,0.1);
+      color: rgba(245,240,232,0.85);
+      border-radius: 2px 12px 12px 2px;
+    }
+    .msg.user .bubble {
+      background: var(--gold);
+      color: var(--ink);
+      border-radius: 12px 2px 2px 12px;
+      font-weight: 400;
+    }
+    .msg-time {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      color: rgba(245,240,232,0.25);
+      letter-spacing: 0.1em;
+    }
+    .msg.user .msg-time { text-align: right; }
+
+    .chat-footer {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(245,240,232,0.06);
+      display: flex;
+      gap: 10px;
+    }
+    .chat-input {
+      flex: 1;
+      background: rgba(245,240,232,0.04);
+      border: 1px solid rgba(245,240,232,0.1);
+      padding: 10px 14px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      color: rgba(245,240,232,0.5);
+      outline: none;
+      font-style: italic;
+    }
+    .send-btn {
+      background: var(--gold);
+      border: none;
+      padding: 10px 18px;
+      color: var(--ink);
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: background 0.2s;
+    }
+    .send-btn:hover { background: var(--rust); color: var(--canvas); }
+
+    /* ── ABOUT / MANIFESTO ── */
+    #about {
+      padding: 120px 24px;
+      max-width: 760px;
+      margin: 0 auto;
+      position: relative;
+    }
+    #about::before {
+      content: '"';
+      position: absolute;
+      top: 80px;
+      left: -20px;
+      font-family: 'Playfair Display', serif;
+      font-size: 280px;
+      line-height: 1;
+      color: rgba(201,168,76,0.05);
+      pointer-events: none;
+    }
+
+    .manifesto {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(22px, 3.5vw, 36px);
+      line-height: 1.4;
+      font-style: italic;
+      color: var(--canvas);
+      font-weight: 400;
+      position: relative;
+      z-index: 1;
+    }
+    .manifesto em {
+      color: var(--gold);
+      font-style: normal;
+    }
+    .manifesto .rust { color: var(--rust); font-style: italic; }
+
+    .manifesto-sub {
+      margin-top: 40px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      line-height: 1.8;
+      color: rgba(245,240,232,0.45);
+      font-weight: 300;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid rgba(245,240,232,0.08);
+      padding: 48px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      text-align: center;
+    }
+
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 900;
+      font-style: italic;
+      color: var(--gold);
+      letter-spacing: -0.02em;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .footer-links a {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.35);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--gold); }
+
+    .footer-social {
+      display: flex;
+      gap: 20px;
+    }
+    .social-link {
+      width: 36px;
+      height: 36px;
+      border: 1px solid rgba(245,240,232,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(245,240,232,0.4);
+      text-decoration: none;
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      transition: all 0.2s;
+    }
+    .social-link:hover { border-color: var(--gold); color: var(--gold); }
+
+    .footer-copy {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: rgba(245,240,232,0.2);
+      text-transform: uppercase;
+    }
+    .footer-copy a { color: rgba(245,240,232,0.35); text-decoration: none; }
+    .footer-copy a:hover { color: var(--gold); }
+
+    /* ── DIVIDER ── */
+    .art-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      gap: 20px;
+      opacity: 0.3;
+    }
+    .art-divider::before, .art-divider::after {
+      content: '';
+      flex: 1;
+      max-width: 200px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold));
+    }
+    .art-divider::after {
+      background: linear-gradient(to left, transparent, var(--gold));
+    }
+    .art-divider span {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      color: var(--gold);
+    }
+
+    /* ── INTERSECT ANIMATIONS ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (max-width: 600px) {
+      .step { grid-template-columns: 48px 1fr; gap: 16px; }
+      .step-num { font-size: 36px; }
+      #about::before { display: none; }
+      .cta-group { flex-direction: column; align-items: center; }
+      .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+
+    <div class="hero-content">
+      <p class="label-top">Gallery &amp; Art Creator Base — Est. 2026</p>
+      <h1 class="wordmark">
+        art<em>house</em>
+      </h1>
+      <p class="tagline">
+        Pixels<span>.</span> Patterns<span>.</span> Paradoxes<span>.</span>
+      </p>
+      <div class="cta-group">
+        <a href="https://t.me/arthousexbt_bot" target="_blank" class="btn-primary">
+          <span>↗ Enter the Bot</span>
+        </a>
+        <a href="#how" class="btn-secondary">How it works</a>
+      </div>
+    </div>
+
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-band">
+    <div class="marquee-track">
+      <span class="marquee-item">Arthouse</span>
+      <span class="marquee-item marquee-dot">✦</span>
+      <span class="marquee-item">Gallery & Creator Base</span>
+      <span class="marquee-item marquee-dot">✦</span>
+      <span class="marquee-item">Pixels. Patterns. Paradoxes.</span>
+      <span class="marquee-item marquee-dot">✦</span>
+      <span class="marquee-item">@arthousebase</span>
+      <span class="marquee-item marquee-dot">✦</span>
+      <span class="marquee-item">Contemporary Art on-chain</span>
+      <span class="marquee-item marquee-dot">✦</span>
+      <span class="marquee-item">Arthouse</span>
+      <span class="marquee-item marquee-dot">✦</span>
+      <span class="marquee-item">Gallery & Creator Base</span>
+      <span class="marquee-item marquee-dot">✦</span>
+      <span class="marquee-item">Pixels. Patterns. Paradoxes.</span>
+      <span class="marquee-item marquee-dot">✦</span>
+      <span class="marquee-item">@arthousebase</span>
+      <span class="marquee-item marquee-dot">✦</span>
+      <span class="marquee-item">Contemporary Art on-chain</span>
+      <span class="marquee-item marquee-dot">✦</span>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="section-header reveal">
+      <span class="section-number">§01</span>
+      <h2 class="section-title">how it works</h2>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <div class="step-body">
+          <h3>Find us on Telegram</h3>
+          <p>Open <a href="https://t.me/arthousexbt_bot" target="_blank">@arthousexbt_bot</a> on Telegram or find <strong style="color:rgba(245,240,232,0.7)">@arthousebase</strong> on X (Twitter). Say hello — the canvas is blank.</p>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">02</div>
+        <div class="step-body">
+          <h3>Share your work or project</h3>
+          <p>Drop your artwork, collection, links, or demo. Whether it's pixels, generative patterns, or conceptual paradoxes — we receive all forms.</p>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">03</div>
+        <div class="step-body">
+          <h3>Receive curatorial feedback</h3>
+          <p>Arthouse analyses your creative output and provides contemporary context, curatorial notes, and community-fit recommendations.</p>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">04</div>
+        <div class="step-body">
+          <h3>Iterate and evolve</h3>
+          <p>Use the feedback, refine your practice, return for more. Each session deepens the dialogue between creator and canvas.</p>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">05</div>
+        <div class="step-body">
+          <h3>Join the creator base</h3>
+          <p>Top contributors gain featured placement in the gallery ecosystem and introductions within the arthouse network of collectors and curators.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="art-divider"><span>✦</span></div>
+
+  <!-- CHAT DEMO -->
+  <section id="demo">
+    <div class="section-header reveal" style="margin-bottom: 40px;">
+      <span class="section-number">§02</span>
+      <h2 class="section-title">the conversation</h2>
+    </div>
+
+    <div class="chat-frame reveal">
+      <div class="chat-header">
+        <div class="chat-avatar">ART</div>
+        <div>
+          <div class="chat-name">arthousexbt_bot</div>
+          <div class="chat-status"><span class="online-dot"></span>online</div>
+        </div>
+      </div>
+      <div class="chat-body">
+        <div class="msg bot" style="animation-delay:0.1s">
+          <div class="bubble">Welcome to arthouse. A space where pixels become paintings and patterns become paradoxes. What are you building?</div>
+          <div class="msg-time">12:38</div>
+        </div>
+        <div class="msg user" style="animation-delay:0.4s">
+          <div class="bubble">I'm working on a generative art collection — 1/1s with recursive patterns.</div>
+          <div class="msg-time">12:39</div>
+        </div>
+        <div class="msg bot" style="animation-delay:0.7s">
+          <div class="bubble">Recursive structures carry a philosophical weight — each iteration a mirror facing a mirror. Share a preview and let's explore what the pattern is trying to say.</div>
+          <div class="msg-time">12:40</div>
+        </div>
+        <div class="msg user" style="animation-delay:1s">
+          <div class="bubble">Here's the link to the collection draft →</div>
+          <div class="msg-time">12:40</div>
+        </div>
+      </div>
+      <div class="chat-footer">
+        <input class="chat-input" type="text" placeholder="Begin the dialogue..." readonly />
+        <a href="https://t.me/arthousexbt_bot" target="_blank" class="send-btn">Open Bot</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="art-divider"><span>✦</span></div>
+
+  <!-- MANIFESTO -->
+  <section id="about">
+    <div class="section-header reveal">
+      <span class="section-number">§03</span>
+      <h2 class="section-title">the manifesto</h2>
+    </div>
+    <p class="manifesto reveal">
+      Arthouse exists at the threshold between <em>algorithm and intuition</em>, between the pixel and the paradox — a <span class="rust">creator base</span> where digital art finds its language.
+    </p>
+    <p class="manifesto-sub reveal">
+      We believe every pattern holds a philosophy. Every pixel a position. The gallery is not a destination — it is a living document, authored collectively by those who dare to make something beautiful from the noise.
+      <br><br>
+      Powered by <a href="https://t.me/arthousexbt_bot" target="_blank" style="color:var(--gold);text-decoration:none">@arthousexbt_bot</a> · Built on dialogue · Curated without compromise.
+    </p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">arthouse</div>
+
+    <div class="footer-social">
+      <a href="https://x.com/arthousebase" target="_blank" class="social-link" title="X / Twitter">𝕏</a>
+      <a href="https://t.me/arthousexbt_bot" target="_blank" class="social-link" title="Telegram">✈</a>
+    </div>
+
+    <div class="footer-links">
+      <a href="https://t.me/arthousexbt_bot" target="_blank">Bot</a>
+      <a href="#how">How it works</a>
+      <a href="#about">Manifesto</a>
+    </div>
+
+    <p class="footer-copy">
+      Gallery &amp; Art Creator Base · @arthousebase ·
+      <a href="https://t.me/arthousexbt_bot" target="_blank">t.me/arthousexbt_bot</a>
+    </p>
+  </footer>
+
+  <script>
+    // Intersection Observer for reveal animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, entry.target.dataset.delay || 0);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach((el, i) => {
+      el.dataset.delay = (i % 4) * 80;
+      observer.observe(el);
+    });
+
+    // Smooth hover parallax on hero
+    document.querySelector('#hero').addEventListener('mousemove', (e) => {
+      const { clientX: x, clientY: y } = e;
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      const dx = (x - cx) / cx;
+      const dy = (y - cy) / cy;
+      document.querySelector('h1.wordmark').style.transform =
+        `translate(${dx * 8}px, ${dy * 5}px)`;
+    });
+  </script>
+</body>
+</html>
