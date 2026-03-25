@@ -13,29 +13,9 @@ body{
   background:#080807;
   color:#f0ece2;
   font-family:'IBM Plex Mono', monospace;
-  overflow:hidden;
 }
 
-/* overlay intro */
-#overlay{
-  position:fixed;
-  inset:0;
-  background:#000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:14px;
-  letter-spacing:.2em;
-  text-transform:uppercase;
-  z-index:9999;
-  transition:opacity .8s ease;
-}
-#overlay.hidden{
-  opacity:0;
-  pointer-events:none;
-}
-
-/* hero */
+/* HERO */
 #hero{
   height:100vh;
   display:flex;
@@ -49,6 +29,7 @@ body{
   color:#d4a843;
   font-size:12px;
   margin-bottom:20px;
+  letter-spacing:.1em;
 }
 
 .hero-title{
@@ -60,6 +41,7 @@ body{
 
 .gold{color:#d4a843}
 
+/* cursor */
 .cursor{
   display:inline-block;
   width:8px;
@@ -68,63 +50,60 @@ body{
   margin-left:4px;
   animation:blink 1s infinite;
 }
+
 @keyframes blink{
   0%,100%{opacity:1}
   50%{opacity:0}
 }
 
-/* whisper */
-.whisper{
-  position:fixed;
-  bottom:20px;
-  left:20px;
-  font-size:10px;
-  opacity:.4;
+/* CTA */
+.cta{
+  margin-top:30px;
 }
 
+.btn{
+  display:inline-block;
+  padding:14px 20px;
+  border:1px solid rgba(255,255,255,0.1);
+  color:#f0ece2;
+  text-decoration:none;
+  font-size:12px;
+  letter-spacing:.1em;
+}
+
+.btn:hover{
+  border-color:#d4a843;
+  color:#d4a843;
+}
 </style>
 </head>
 
 <body>
 
-<div id="overlay">you weren't supposed to be here</div>
-
 <section id="hero">
   <div class="hero-text">
     <span id="typed"></span><span class="cursor"></span>
   </div>
+
   <div class="hero-title">
     art<span class="gold">house</span>
+  </div>
+
+  <div class="cta">
+    <a href="https://t.me/arthousexbt_bot" target="_blank" class="btn">
+      open the bot →
+    </a>
   </div>
 </section>
 
 <script>
 
-// ===== MEMORY =====
-const firstVisit = localStorage.getItem("arthouse_first");
+// ===== MEMORY (SAFE, TIDAK BLOCK) =====
 const lastVisit = localStorage.getItem("arthouse_last");
-
-if(!firstVisit){
-  localStorage.setItem("arthouse_first", Date.now());
-}
-
 localStorage.setItem("arthouse_last", Date.now());
 
-// ===== OVERLAY FLOW (SAFE) =====
-const overlay = document.getElementById("overlay");
-
-setTimeout(()=>{
-  overlay.innerText = "...but now that you're here";
-},1200);
-
-setTimeout(()=>{
-  overlay.classList.add("hidden");
-},2200);
-
-// ===== DYNAMIC TEXT =====
-const el = document.getElementById("typed");
-
-let phrase = "arthouse_init.exe";
+// ===== TEXT LOGIC =====
+let phrase = "arthouse_init.exe — gallery & art creators";
 
 if(lastVisit){
   const diff = Date.now() - lastVisit;
@@ -138,26 +117,32 @@ if(lastVisit){
   }
 }
 
-// ===== TYPEWRITER (SMOOTH) =====
+// ===== TYPEWRITER (INSTANT START) =====
+const el = document.getElementById("typed");
+
 let i = 0;
 function type(){
   el.textContent = phrase.slice(0,i);
   if(i++ <= phrase.length){
-    setTimeout(type, 35);
+    setTimeout(type, 30);
   }
 }
 
-setTimeout(type, 2400);
+type(); // LANGSUNG JALAN (tidak pakai delay)
 
-// ===== RANDOM WHISPER =====
+// ===== OPTIONAL WHISPER (TIDAK GANGGU) =====
 setTimeout(()=>{
-  if(Math.random() > 0.6){
+  if(Math.random() > 0.7){
     const w = document.createElement("div");
-    w.className = "whisper";
-    w.innerText = "i'm still watching";
+    w.style.position="fixed";
+    w.style.bottom="20px";
+    w.style.left="20px";
+    w.style.fontSize="10px";
+    w.style.opacity="0.4";
+    w.innerText="i'm still watching";
     document.body.appendChild(w);
   }
-},5000);
+},4000);
 
 </script>
 
