@@ -1,59 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#080807" />
-  <title>arthouse — pixels. patterns. paradoxes.</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Playfair+Display:ital,wght@0,900;1,400;1,700;1,900&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>arthouse</title>
 
-  <style>
-    :root {
-      --bg:#080807;--bg2:#0f0f0d;--line:rgba(255,255,255,0.08);
-      --white:#f0ece2;--dim:rgba(240,236,226,0.92);--faint:rgba(240,236,226,0.70);
-      --gold:#d4a843;--amber:#e8891a;--green:#4ade80;
-      --mono:'IBM Plex Mono', monospace;--serif:'Playfair Display', serif;
-    }
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{background:var(--bg);color:var(--white);font-family:var(--mono);overflow-x:hidden}
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=Playfair+Display:ital,wght@1,900&display=swap" rel="stylesheet">
 
-    body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:9000}
+<style>
+body{
+  margin:0;
+  background:#080807;
+  color:#f0ece2;
+  font-family:'IBM Plex Mono', monospace;
+  overflow:hidden;
+}
 
-    #overlay{
-      position:fixed;inset:0;background:#000;z-index:9999;
-      display:flex;align-items:center;justify-content:center;
-      color:#fff;font-size:14px;letter-spacing:.2em;text-transform:uppercase;
-      transition:opacity .8s ease;
-    }
+/* overlay intro */
+#overlay{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  z-index:9999;
+  transition:opacity .8s ease;
+}
+#overlay.hidden{
+  opacity:0;
+  pointer-events:none;
+}
 
-    #overlay.hidden{opacity:0;pointer-events:none}
+/* hero */
+#hero{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:flex-start;
+  padding:40px;
+}
 
-    #hero{min-height:100svh;padding:80px 24px 60px;display:flex;flex-direction:column;justify-content:center}
+.hero-text{
+  color:#d4a843;
+  font-size:12px;
+  margin-bottom:20px;
+}
 
-    .hero-prompt{font-size:12px;letter-spacing:.12em;color:var(--gold);margin-bottom:32px}
-    .cursor-blink{display:inline-block;width:8px;height:14px;background:var(--green);animation:blink 1s step-end infinite}
-    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.hero-title{
+  font-family:'Playfair Display', serif;
+  font-style:italic;
+  font-weight:900;
+  font-size:clamp(60px,20vw,140px);
+}
 
-    .hero-title{font-family:var(--serif);font-weight:900;font-style:italic;font-size:clamp(70px,22vw,180px)}
-    .gold{color:var(--gold)}
+.gold{color:#d4a843}
 
-  </style>
+.cursor{
+  display:inline-block;
+  width:8px;
+  height:14px;
+  background:#4ade80;
+  margin-left:4px;
+  animation:blink 1s infinite;
+}
+@keyframes blink{
+  0%,100%{opacity:1}
+  50%{opacity:0}
+}
+
+/* whisper */
+.whisper{
+  position:fixed;
+  bottom:20px;
+  left:20px;
+  font-size:10px;
+  opacity:.4;
+}
+
+</style>
 </head>
+
 <body>
 
 <div id="overlay">you weren't supposed to be here</div>
 
 <section id="hero">
-  <p class="hero-prompt">
-    <span id="typed-text"></span><span class="cursor-blink"></span>
-  </p>
-  <h1 class="hero-title">art<span class="gold">house</span></h1>
+  <div class="hero-text">
+    <span id="typed"></span><span class="cursor"></span>
+  </div>
+  <div class="hero-title">
+    art<span class="gold">house</span>
+  </div>
 </section>
 
 <script>
 
-// ===== MEMORY SYSTEM =====
+// ===== MEMORY =====
 const firstVisit = localStorage.getItem("arthouse_first");
 const lastVisit = localStorage.getItem("arthouse_last");
 
@@ -63,26 +110,25 @@ if(!firstVisit){
 
 localStorage.setItem("arthouse_last", Date.now());
 
-// ===== OVERLAY SEQUENCE =====
+// ===== OVERLAY FLOW (SAFE) =====
 const overlay = document.getElementById("overlay");
 
 setTimeout(()=>{
   overlay.innerText = "...but now that you're here";
-},2000);
+},1200);
 
 setTimeout(()=>{
   overlay.classList.add("hidden");
-},4000);
+},2200);
 
 // ===== DYNAMIC TEXT =====
-const target = document.getElementById('typed-text');
+const el = document.getElementById("typed");
 
-let phrase;
+let phrase = "arthouse_init.exe";
 
-if(!lastVisit){
-  phrase = "initializing unknown presence...";
-}else{
+if(lastVisit){
   const diff = Date.now() - lastVisit;
+
   if(diff < 60000){
     phrase = "you returned too quickly...";
   }else if(diff < 3600000){
@@ -92,29 +138,26 @@ if(!lastVisit){
   }
 }
 
+// ===== TYPEWRITER (SMOOTH) =====
 let i = 0;
 function type(){
-  target.textContent = phrase.slice(0,i);
+  el.textContent = phrase.slice(0,i);
   if(i++ <= phrase.length){
-    setTimeout(type, 40 + Math.random()*80);
+    setTimeout(type, 35);
   }
 }
 
-setTimeout(type, 4500);
+setTimeout(type, 2400);
 
 // ===== RANDOM WHISPER =====
 setTimeout(()=>{
   if(Math.random() > 0.6){
-    const whisper = document.createElement("div");
-    whisper.style.position="fixed";
-    whisper.style.bottom="20px";
-    whisper.style.left="20px";
-    whisper.style.fontSize="10px";
-    whisper.style.opacity="0.5";
-    whisper.innerText="i'm still watching";
-    document.body.appendChild(whisper);
+    const w = document.createElement("div");
+    w.className = "whisper";
+    w.innerText = "i'm still watching";
+    document.body.appendChild(w);
   }
-},8000);
+},5000);
 
 </script>
 
